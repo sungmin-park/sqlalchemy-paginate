@@ -29,7 +29,7 @@ def ctx(count, page=1):
     try:
         session.flush()
         pagination = Pagination(session.query(Item.id), page=page, per_page=3,
-                                map_=first)
+                                per_nav=3, map_=first)
         assert pagination.total == count
         yield pagination
     finally:
@@ -66,3 +66,24 @@ def test_last_page():
         assert p.last == 2
     with ctx(6) as p:
         assert p.last == 2
+
+
+def test_nav_head():
+    with ctx(31, 1) as p:
+        assert p.nav_head == 1
+    with ctx(31, 2) as p:
+        assert p.nav_head == 1
+    with ctx(31, 3) as p:
+        assert p.nav_head == 1
+    with ctx(31, 4) as p:
+        assert p.nav_head == 4
+    with ctx(31, 5) as p:
+        assert p.nav_head == 4
+    with ctx(31, 6) as p:
+        assert p.nav_head == 4
+    with ctx(31, 7) as p:
+        assert p.nav_head == 7
+    with ctx(31, 8) as p:
+        assert p.nav_head == 7
+    with ctx(31, 9) as p:
+        assert p.nav_head == 7
