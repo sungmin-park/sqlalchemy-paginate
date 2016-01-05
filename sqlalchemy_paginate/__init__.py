@@ -21,6 +21,8 @@ class Pagination(object):
         else:
             self.last = int_ceil(self.total, per_page)
         self.page = max(min(self.last, page), 1)
+        self.prev = max(self.page - 1, 1)
+        self.next = min(self.page + 1, self.last)
 
         self.nav_head = per_nav * (int_ceil(self.page, per_nav) - 1) + 1
         self.nav_tail = min(self.last, self.nav_head + per_nav - 1)
@@ -29,4 +31,3 @@ class Pagination(object):
 
         start = (self.page - 1) * per_page
         self.items = map(map_, query[start: start + per_page])
-

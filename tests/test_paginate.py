@@ -128,3 +128,11 @@ def test_items():
 
 def test_first():
     assert paginate(0).first == 1
+
+
+def test_prev():
+    assert paginate(0).prev == 1
+
+
+def test_next():
+    assert paginate(0).next == 1
