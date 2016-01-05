@@ -134,13 +134,36 @@ def test_prev():
     assert paginate(0).prev == 1
 
 
+def test_has_prev():
+    assert paginate(0).has_prev is False
+    assert paginate(4, 2).has_prev is True
+
+
 def test_next():
     assert paginate(0).next == 1
+
+
+def test_has_next():
+    assert paginate(0).has_next is False
+    assert paginate(4).has_next is True
+    assert paginate(4, 2).has_next is False
 
 
 def test_nav_prev():
     assert paginate(0).nav_prev == 1
 
 
+def test_has_nav_prev():
+    assert paginate(0).has_nav_prev is False
+    assert paginate(10, 1).has_nav_prev is False
+    assert paginate(10, 4).has_nav_prev is True
+
+
 def test_nav_next():
     assert paginate(0).nav_next == 1
+
+
+def test_has_nav_next():
+    assert paginate(0).has_nav_next is False
+    assert paginate(10).has_nav_next is True
+    assert paginate(10, 4).has_nav_next is False

@@ -21,14 +21,19 @@ class Pagination(object):
         else:
             self.last = int_ceil(self.total, per_page)
         self.page = max(min(self.last, page), 1)
-        self.prev = max(self.page - 1, 1)
-        self.next = min(self.page + 1, self.last)
 
-        self.nav_prev = max(self.page - per_nav, 1)
-        self.nav_next = min(self.page + per_nav, self.last)
+        self.prev = max(self.page - 1, 1)
+        self.has_prev = self.prev != self.page
+        self.next = min(self.page + 1, self.last)
+        self.has_next = self.next != self.page
 
         self.nav_head = per_nav * (int_ceil(self.page, per_nav) - 1) + 1
         self.nav_tail = min(self.last, self.nav_head + per_nav - 1)
+
+        self.nav_prev = max(self.page - per_nav, 1)
+        self.has_nav_prev = self.nav_prev < self.nav_head
+        self.nav_next = min(self.page + per_nav, self.last)
+        self.has_nav_next = self.nav_next > self.nav_tail
 
         self.pages = range(self.nav_head, self.nav_tail + 1)
 
