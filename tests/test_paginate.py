@@ -69,6 +69,9 @@ def test_last_page():
 
 
 def test_nav_head():
+    with ctx(0) as p:
+        assert p.nav_head == 1
+
     with ctx(31, 1) as p:
         assert p.nav_head == 1
     with ctx(31, 2) as p:
@@ -92,6 +95,9 @@ def test_nav_head():
 
 
 def test_nav_tail():
+    with ctx(0) as p:
+        assert p.nav_tail == 1
+
     with ctx(31, 1) as p:
         assert p.nav_tail == 3
     with ctx(31, 2) as p:
@@ -120,3 +126,36 @@ def test_nav_tail():
     with ctx(31, 12) as p:
         assert p.page == 11
         assert p.nav_tail == 11
+
+
+def test_pages():
+    with ctx(0) as p:
+        assert p.pages == [1]
+
+    with ctx(31, 1) as p:
+        assert p.pages == [1, 2, 3]
+    with ctx(31, 2) as p:
+        assert p.pages == [1, 2, 3]
+    with ctx(31, 3) as p:
+        assert p.pages == [1, 2, 3]
+
+    with ctx(31, 4) as p:
+        assert p.pages == [4, 5, 6]
+    with ctx(31, 5) as p:
+        assert p.pages == [4, 5, 6]
+    with ctx(31, 6) as p:
+        assert p.pages == [4, 5, 6]
+
+    with ctx(31, 7) as p:
+        assert p.pages == [7, 8, 9]
+    with ctx(31, 8) as p:
+        assert p.pages == [7, 8, 9]
+    with ctx(31, 9) as p:
+        assert p.pages == [7, 8, 9]
+
+    with ctx(31, 10) as p:
+        assert p.pages == [10, 11]
+    with ctx(31, 11) as p:
+        assert p.pages == [10, 11]
+    with ctx(31, 12) as p:
+        assert p.pages == [10, 11]

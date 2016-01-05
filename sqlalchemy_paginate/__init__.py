@@ -22,3 +22,4 @@ class Pagination(object):
         self.page = max(min(self.last, page), 1)
         self.nav_head = per_nav * (int_ceil(self.page, per_nav) - 1) + 1
         self.nav_tail = min(self.last, self.nav_head + per_nav - 1)
+        self.pages = range(self.nav_head, self.nav_tail + 1)
