@@ -1,5 +1,3 @@
-from contextlib import contextmanager
-
 from sqlalchemy import create_engine, Column, Integer
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -19,8 +17,7 @@ class Item(Base):
 Base.metadata.create_all()
 
 
-@contextmanager
-def ctx(count, page=1):
+def paginate(count, page=1):
     def first(item):
         return item[0]
 
@@ -31,150 +28,99 @@ def ctx(count, page=1):
         pagination = Pagination(session.query(Item.id), page=page, per_page=3,
                                 per_nav=3, map_=first)
         assert pagination.total == count
-        yield pagination
+        return pagination
     finally:
         session.rollback()
         session.close()
 
 
 def test_normalize_page():
-    with ctx(0) as pagination:
-        assert pagination.page == 1
+    assert paginate(0).page == 1
 
     # prevent overflow
-    with ctx(0, 2) as pagination:
-        assert pagination.page == 1
+    assert paginate(0, 2).page == 1
 
     # prevent underflow
-    with ctx(0, 0) as pagination:
-        assert pagination.page == 1
+    assert paginate(0, 0).page == 1
 
 
 def test_last_page():
-    with ctx(0) as p:
-        assert p.last == 1
-    with ctx(1) as p:
-        assert p.last == 1
-    with ctx(2) as p:
-        assert p.last == 1
-    with ctx(3) as p:
-        assert p.last == 1
+    assert paginate(0).last == 1
 
-    with ctx(4) as p:
-        assert p.last == 2
-    with ctx(5) as p:
-        assert p.last == 2
-    with ctx(6) as p:
-        assert p.last == 2
+    assert paginate(1).last == 1
+    assert paginate(2).last == 1
+    assert paginate(3).last == 1
+
+    assert paginate(4).last == 2
+    assert paginate(5).last == 2
+    assert paginate(6).last == 2
 
 
 def test_nav_head():
-    with ctx(0) as p:
-        assert p.nav_head == 1
+    assert paginate(0).nav_head == 1
 
-    with ctx(31, 1) as p:
-        assert p.nav_head == 1
-    with ctx(31, 2) as p:
-        assert p.nav_head == 1
-    with ctx(31, 3) as p:
-        assert p.nav_head == 1
+    assert paginate(31, 1).nav_head == 1
+    assert paginate(31, 2).nav_head == 1
+    assert paginate(31, 3).nav_head == 1
 
-    with ctx(31, 4) as p:
-        assert p.nav_head == 4
-    with ctx(31, 5) as p:
-        assert p.nav_head == 4
-    with ctx(31, 6) as p:
-        assert p.nav_head == 4
+    assert paginate(31, 4).nav_head == 4
+    assert paginate(31, 5).nav_head == 4
+    assert paginate(31, 6).nav_head == 4
 
-    with ctx(31, 7) as p:
-        assert p.nav_head == 7
-    with ctx(31, 8) as p:
-        assert p.nav_head == 7
-    with ctx(31, 9) as p:
-        assert p.nav_head == 7
+    assert paginate(31, 7).nav_head == 7
+    assert paginate(31, 8).nav_head == 7
+    assert paginate(31, 9).nav_head == 7
 
 
 def test_nav_tail():
-    with ctx(0) as p:
-        assert p.nav_tail == 1
+    assert paginate(0).nav_tail == 1
 
-    with ctx(31, 1) as p:
-        assert p.nav_tail == 3
-    with ctx(31, 2) as p:
-        assert p.nav_tail == 3
-    with ctx(31, 3) as p:
-        assert p.nav_tail == 3
+    assert paginate(31, 1).nav_tail == 3
+    assert paginate(31, 2).nav_tail == 3
+    assert paginate(31, 3).nav_tail == 3
 
-    with ctx(31, 4) as p:
-        assert p.nav_tail == 6
-    with ctx(31, 5) as p:
-        assert p.nav_tail == 6
-    with ctx(31, 6) as p:
-        assert p.nav_tail == 6
+    assert paginate(31, 4).nav_tail == 6
+    assert paginate(31, 5).nav_tail == 6
+    assert paginate(31, 6).nav_tail == 6
 
-    with ctx(31, 7) as p:
-        assert p.nav_tail == 9
-    with ctx(31, 8) as p:
-        assert p.nav_tail == 9
-    with ctx(31, 9) as p:
-        assert p.nav_tail == 9
+    assert paginate(31, 7).nav_tail == 9
+    assert paginate(31, 8).nav_tail == 9
+    assert paginate(31, 9).nav_tail == 9
 
-    with ctx(31, 10) as p:
-        assert p.nav_tail == 11
-    with ctx(31, 11) as p:
-        assert p.nav_tail == 11
-    with ctx(31, 12) as p:
-        assert p.page == 11
-        assert p.nav_tail == 11
+    assert paginate(31, 10).nav_tail == 11
+    assert paginate(31, 11).nav_tail == 11
+    p = paginate(31, 12)
+    assert p.page == 11
+    assert p.nav_tail == 11
 
 
 def test_pages():
-    with ctx(0) as p:
-        assert p.pages == [1]
+    assert paginate(0).pages == [1]
 
-    with ctx(31, 1) as p:
-        assert p.pages == [1, 2, 3]
-    with ctx(31, 2) as p:
-        assert p.pages == [1, 2, 3]
-    with ctx(31, 3) as p:
-        assert p.pages == [1, 2, 3]
+    assert paginate(31, 1).pages == [1, 2, 3]
+    assert paginate(31, 2).pages == [1, 2, 3]
+    assert paginate(31, 3).pages == [1, 2, 3]
 
-    with ctx(31, 4) as p:
-        assert p.pages == [4, 5, 6]
-    with ctx(31, 5) as p:
-        assert p.pages == [4, 5, 6]
-    with ctx(31, 6) as p:
-        assert p.pages == [4, 5, 6]
+    assert paginate(31, 4).pages == [4, 5, 6]
+    assert paginate(31, 5).pages == [4, 5, 6]
+    assert paginate(31, 6).pages == [4, 5, 6]
 
-    with ctx(31, 7) as p:
-        assert p.pages == [7, 8, 9]
-    with ctx(31, 8) as p:
-        assert p.pages == [7, 8, 9]
-    with ctx(31, 9) as p:
-        assert p.pages == [7, 8, 9]
+    assert paginate(31, 7).pages == [7, 8, 9]
+    assert paginate(31, 8).pages == [7, 8, 9]
+    assert paginate(31, 9).pages == [7, 8, 9]
 
-    with ctx(31, 10) as p:
-        assert p.pages == [10, 11]
-    with ctx(31, 11) as p:
-        assert p.pages == [10, 11]
-    with ctx(31, 12) as p:
-        assert p.pages == [10, 11]
+    assert paginate(31, 10).pages == [10, 11]
+    assert paginate(31, 11).pages == [10, 11]
+    assert paginate(31, 12).pages == [10, 11]
 
 
 def test_items():
-    with ctx(0) as p:
-        assert p.items == []
+    assert paginate(0).items == []
 
-    with ctx(31, 1) as p:
-        assert p.items == [1, 2, 3]
-    with ctx(31, 2) as p:
-        assert p.items == [4, 5, 6]
-    with ctx(31, 3) as p:
-        assert p.items == [7, 8, 9]
+    assert paginate(31, 1).items == [1, 2, 3]
+    assert paginate(31, 2).items == [4, 5, 6]
+    assert paginate(31, 3).items == [7, 8, 9]
 
-    with ctx(31, 10) as p:
-        assert p.items == [28, 29, 30]
-    with ctx(31, 11) as p:
-        assert p.items == [31]
-    with ctx(31, 12) as p:
-        assert p.items == [31]
+    assert paginate(31, 10).items == [28, 29, 30]
+    assert paginate(31, 11).items == [31]
+    assert paginate(31, 12).items == [31]
