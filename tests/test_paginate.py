@@ -159,3 +159,22 @@ def test_pages():
         assert p.pages == [10, 11]
     with ctx(31, 12) as p:
         assert p.pages == [10, 11]
+
+
+def test_items():
+    with ctx(0) as p:
+        assert p.items == []
+
+    with ctx(31, 1) as p:
+        assert p.items == [1, 2, 3]
+    with ctx(31, 2) as p:
+        assert p.items == [4, 5, 6]
+    with ctx(31, 3) as p:
+        assert p.items == [7, 8, 9]
+
+    with ctx(31, 10) as p:
+        assert p.items == [28, 29, 30]
+    with ctx(31, 11) as p:
+        assert p.items == [31]
+    with ctx(31, 12) as p:
+        assert p.items == [31]
