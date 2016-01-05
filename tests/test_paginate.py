@@ -75,12 +75,14 @@ def test_nav_head():
         assert p.nav_head == 1
     with ctx(31, 3) as p:
         assert p.nav_head == 1
+
     with ctx(31, 4) as p:
         assert p.nav_head == 4
     with ctx(31, 5) as p:
         assert p.nav_head == 4
     with ctx(31, 6) as p:
         assert p.nav_head == 4
+
     with ctx(31, 7) as p:
         assert p.nav_head == 7
     with ctx(31, 8) as p:
