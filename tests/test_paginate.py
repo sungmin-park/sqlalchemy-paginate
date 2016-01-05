@@ -124,3 +124,7 @@ def test_items():
     assert paginate(31, 10).items == [28, 29, 30]
     assert paginate(31, 11).items == [31]
     assert paginate(31, 12).items == [31]
+
+
+def test_first():
+    assert paginate(0).first == 1
