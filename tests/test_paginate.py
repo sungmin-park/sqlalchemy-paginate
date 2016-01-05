@@ -136,3 +136,11 @@ def test_prev():
 
 def test_next():
     assert paginate(0).next == 1
+
+
+def test_nav_prev():
+    assert paginate(0).nav_prev == 1
+
+
+def test_nav_next():
+    assert paginate(0).nav_next == 1
